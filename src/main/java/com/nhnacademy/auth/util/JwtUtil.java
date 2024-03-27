@@ -1,13 +1,18 @@
 package com.nhnacademy.auth.util;
 
+import com.nhnacademy.auth.config.KeyConfig;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Date;
@@ -15,6 +20,7 @@ import java.util.Date;
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@ConfigurationProperties(prefix = "jwt")
 public class JwtUtil {
 
     private static final Long ACCESS_TOKEN_VALID_TIME = Duration.ofHours(1).toMillis();
@@ -24,6 +30,17 @@ public class JwtUtil {
 
     public static final String AUTH_HEADER = "Authorization";
     public static final String TOKEN_TYPE = "Bearer ";
+
+    private final KeyConfig keyConfig;
+
+    private String secret;
+
+
+
+    @PostConstruct
+    private void init() {
+        this.secret = keyConfig.keyStorage("d73b88ac78824176a9051e9a8880d1b8");
+    }
 
     private static String createToken(String memberId,
                                Collection<? extends GrantedAuthority> authorities,
