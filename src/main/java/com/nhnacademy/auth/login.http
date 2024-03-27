@@ -1,9 +1,9 @@
-POST http://localhost:8090/auth/login
+POST http://125.6.37.93:8090/auth/login
 Content-Type: application/json
 
 {
   "id": "admin",
-  "password": "12345"
+  "password": "1234"
 }
 
 ###
