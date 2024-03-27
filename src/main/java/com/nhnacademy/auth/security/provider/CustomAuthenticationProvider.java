@@ -7,7 +7,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 
 @Slf4j
 public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
@@ -17,10 +16,10 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
         String memberId = (String) authentication.getPrincipal();
         String memberPwd = (String) authentication.getCredentials();
 
-        User user =(User) this.getUserDetailsService().loadUserByUsername(memberId);
+        User user = (User) this.getUserDetailsService().loadUserByUsername(memberId);
 
         if (!this.getPasswordEncoder().matches(memberPwd, user.getPassword())) {
-            log.info("{}","wrong password");
+            log.info("{}", "wrong password");
             throw new BadCredentialsException("BadCredentialsException");
         }
 

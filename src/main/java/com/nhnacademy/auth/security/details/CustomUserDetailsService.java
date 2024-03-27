@@ -27,6 +27,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         LoginRequestDto loginRequestDto = memberAdaptor.getMember(username);
 
 
+
+
         log.info("{}","run User Details Service");
         log.info("{}",loginRequestDto);
 
