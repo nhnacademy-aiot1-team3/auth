@@ -1,7 +1,7 @@
 package com.nhnacademy.auth.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nhnacademy.auth.member.dto.LoginRequestDto;
+import com.nhnacademy.auth.member.dto.request.LoginRequestDto;
 import com.nhnacademy.auth.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
