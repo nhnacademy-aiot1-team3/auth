@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.util.Optional;
 
 
-@FeignClient(value = "account-service", path = "/member")
+@FeignClient(value = "account-service")
 public interface MemberAdaptor {
-    @GetMapping("/{memberId}")
+    @GetMapping("/member/{memberId}")
     Optional<LoginInfoResponseDto> getMember(@PathVariable("memberId") String memberId);
 }
 
