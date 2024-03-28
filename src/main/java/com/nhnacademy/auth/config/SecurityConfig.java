@@ -9,6 +9,7 @@ import com.nhnacademy.auth.security.provider.CustomAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -29,6 +30,7 @@ public class SecurityConfig {
     private final ObjectMapper objectMapper;
     private final CustomUserDetailsService customUserDetailsService;
     private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     private static final String LOGIN_URL = "/auth/login";
 
@@ -68,7 +70,7 @@ public class SecurityConfig {
 
     @Bean
     public CustomAuthenticationFilter customAuthenticationFilter() throws Exception {
-        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(objectMapper);
+        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(objectMapper,redisTemplate);
 
         customAuthenticationFilter.setFilterProcessesUrl(LOGIN_URL);
         customAuthenticationFilter.setAuthenticationManager(getAuthenticationManager(null));

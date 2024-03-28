@@ -33,19 +33,29 @@ public class JwtUtil {
 
     private final KeyConfig keyConfig;
 
-    private String secret;
+    private static String secret;
 
 
+    public String getSecret() {
+        return secret;
+    }
+
+    public void setSecret(String secret) {
+        this.secret = secret;
+    }
 
     @PostConstruct
     private void init() {
-        this.secret = keyConfig.keyStorage("d73b88ac78824176a9051e9a8880d1b8");
+        this.secret = keyConfig.keyStorage(secret);
     }
 
     private static String createToken(String memberId,
                                Collection<? extends GrantedAuthority> authorities,
                                String tokenType,
                                Long tokenValidTime) {
+
+        log.info("{}",secret);
+
         Claims claims = Jwts.claims().setSubject(tokenType);
 
         claims.put("memberId", memberId);
@@ -57,7 +67,7 @@ public class JwtUtil {
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + tokenValidTime))
-                .signWith(SignatureAlgorithm.HS256, "Ny0pm2CWIAST07ElsTAVZgCqJKJd2bE9lpKyewuOhyyKoBApt1Ny0pm2CWIAST07ElsTAVZgCqJKJd2bE9lpKyewuOhyyKoBApt1")
+                .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
 
     }

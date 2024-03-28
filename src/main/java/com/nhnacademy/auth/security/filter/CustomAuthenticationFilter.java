@@ -5,6 +5,7 @@ import com.nhnacademy.auth.member.dto.request.LoginRequestDto;
 import com.nhnacademy.auth.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -17,8 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static com.nhnacademy.auth.util.JwtUtil.AUTH_HEADER;
-import static com.nhnacademy.auth.util.JwtUtil.TOKEN_TYPE;
+import static com.nhnacademy.auth.util.JwtUtil.*;
 
 
 /**
@@ -31,6 +31,7 @@ import static com.nhnacademy.auth.util.JwtUtil.TOKEN_TYPE;
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final ObjectMapper objectMapper;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -52,8 +53,18 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         UserDetails principal = (UserDetails) authResult.getPrincipal();
 
         String accessToken = JwtUtil.createAccessToken(principal.getUsername(), principal.getAuthorities());
+        String refreshToken = JwtUtil.createRefreshToken(principal.getUsername(), principal.getAuthorities());
+
+        redisTemplate.opsForSet().add(principal.getUsername(), refreshToken);
 
         response.setHeader("Login-Success", "true");
         response.setHeader(AUTH_HEADER, TOKEN_TYPE + accessToken);
+    }
+
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+        log.info("{}", "Invalid Id or Password");
+        response.setStatus(400);
+        response.setHeader("Login-Success","false");
     }
 }
