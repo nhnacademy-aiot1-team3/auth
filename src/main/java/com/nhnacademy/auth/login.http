@@ -14,3 +14,7 @@ Content-Type: application/json
   "id": "admin",
   "password": "1234"
 }
+
+###
+GET http://133.186.218.201:8090/member/admin
+
