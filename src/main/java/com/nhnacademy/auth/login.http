@@ -1,4 +1,4 @@
-POST http://125.6.37.93:9090/auth/login
+POST http://180.210.82.253:9090/auth/login
 Content-Type: application/json
 
 {
