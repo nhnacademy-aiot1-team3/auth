@@ -14,11 +14,3 @@ Content-Type: application/json
   "id": "admin",
   "password": "1234"
 }
-
-###
-GET https://api-keymanager.nhncloudservice.com/keymanager/v1.0/appkey/qTQNj7LyHhdAazH3/secrets/3045229bd5f4418fb2f7a5b93d40f230
-Content-Type: application/json
-###
-
-GET https://api-keymanager.nhncloudservice.com/keymanager/v1.0/appkey/qTQNj7LyHhdAazH3/symmetric-keys/67598be3c475408ea485ff8ab7797bc6/symmetric-key
-Content-Type: application/json

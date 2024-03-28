@@ -24,14 +24,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         List<SimpleGrantedAuthority> grantedAuthorities = List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
-        LoginInfoResponseDto loginInfoResponseDto = memberAdaptor.getMember(username);
+        LoginInfoResponseDto loginInfoResponseDto = memberAdaptor.getMember(username).orElse(null);
 
-
-
-
-        log.info("{}","run User Details Service");
-        log.info("{}",loginInfoResponseDto);
-
-        return new User("admin","$2a$10$.xGqjMDwGMhb1KzAjMQ8V.GoqCw5lk6dXkSCPO/rhSVJMXtNQ5LfG",grantedAuthorities);
+        return new User(loginInfoResponseDto.getId(),"$2a$10$.xGqjMDwGMhb1KzAjMQ8V.GoqCw5lk6dXkSCPO/rhSVJMXtNQ5LfG",grantedAuthorities);
     }
 }
