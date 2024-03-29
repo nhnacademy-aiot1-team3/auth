@@ -82,10 +82,6 @@ public class SecurityConfig {
         CustomAuthenticationProvider customAuthenticationProvider = new CustomAuthenticationProvider();
 
         customAuthenticationProvider.setUserDetailsService(customUserDetailsService);
-
-        String encode = passwordEncoder().encode("123");
-        log.info(encode);
-
         customAuthenticationProvider.setPasswordEncoder(passwordEncoder());
 
         return customAuthenticationProvider;
