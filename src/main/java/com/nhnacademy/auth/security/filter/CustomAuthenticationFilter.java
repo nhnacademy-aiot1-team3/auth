@@ -1,6 +1,7 @@
 package com.nhnacademy.auth.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nhnacademy.auth.exception.LoginRequestDtoParsingException;
 import com.nhnacademy.auth.member.dto.request.LoginRequestDto;
 import com.nhnacademy.auth.member.dto.response.ResponseDto;
 import com.nhnacademy.auth.member.dto.response.ResponseHeaderDto;
@@ -23,8 +24,11 @@ import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
-import static com.nhnacademy.auth.token.util.JwtUtil.*;
+import static com.nhnacademy.auth.token.util.JwtUtil.ACCESS_TOKEN_VALID_TIME;
+import static com.nhnacademy.auth.token.util.JwtUtil.REFRESH_TOKEN_VALID_TIME;
 
 
 /**
@@ -38,18 +42,18 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
     private static final String LOGIN_SUCCESS = "Login-Success";
 
+    private final JwtUtil jwtUtil;
     private final ObjectMapper objectMapper;
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, Object>redisTemplate;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        LoginRequestDto loginRequestDto = null;
+        LoginRequestDto loginRequestDto;
         try {
             loginRequestDto = objectMapper.readValue(request.getInputStream(), LoginRequestDto.class);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new LoginRequestDtoParsingException();
         }
-
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loginRequestDto.getId(), loginRequestDto.getPassword());
 
         return this.getAuthenticationManager().authenticate(token);
@@ -59,10 +63,12 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException {
         UserDetails principal = (UserDetails) authResult.getPrincipal();
 
-        String accessToken = JwtUtil.createAccessToken(principal.getUsername(), principal.getAuthorities());
-        String refreshToken = JwtUtil.createRefreshToken(principal.getUsername(), principal.getAuthorities());
+        String accessToken = jwtUtil.createAccessToken(principal.getUsername(), principal.getAuthorities());
+        String refreshToken = jwtUtil.createRefreshToken(principal.getUsername(), principal.getAuthorities());
 
-        redisTemplate.opsForSet().add(principal.getUsername(), refreshToken);
+
+        redisTemplate.opsForValue().set(refreshToken,principal.getUsername());
+        redisTemplate.expire(refreshToken, REFRESH_TOKEN_VALID_TIME, TimeUnit.MILLISECONDS);
 
 
         TokenResponseDto tokenResponseDto = new TokenResponseDto(
@@ -78,7 +84,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         response.setHeader(LOGIN_SUCCESS, "true");
         ResponseHeaderDto responseHeaderDto = new ResponseHeaderDto(0L, "로그인 성공");
 
-        ResponseDto responseDto = new ResponseDto(responseHeaderDto, tokenResponseDto);
+        ResponseDto<ResponseHeaderDto, TokenResponseDto> responseDto = new ResponseDto<>(responseHeaderDto, tokenResponseDto);
 
 
         response.getWriter().println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseDto));
@@ -86,7 +92,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException {
-//        response.setStatus(HttpStatus.BAD_REQUEST.value());
+        response.setStatus(HttpStatus.BAD_REQUEST.value());
         ResponseHeaderDto responseHeaderDto = null;
 
         if (failed instanceof BadCredentialsException) {
@@ -100,7 +106,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
         response.setHeader(LOGIN_SUCCESS, "false");
 
-        ResponseDto responseDto = new ResponseDto(responseHeaderDto, null);
+        ResponseDto<ResponseHeaderDto, TokenResponseDto> responseDto = new ResponseDto<>(responseHeaderDto, null);
 
         response.getWriter().println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(responseDto));
     }

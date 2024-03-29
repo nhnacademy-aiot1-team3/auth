@@ -1,12 +1,15 @@
 package com.nhnacademy.auth.token.util;
 
 import com.nhnacademy.auth.config.KeyConfig;
+import com.nhnacademy.auth.exception.InvalidClaimsException;
 import com.nhnacademy.auth.exception.InvalidTokenException;
+import com.nhnacademy.auth.exception.RefreshTokenNotExistException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +17,7 @@ import javax.annotation.PostConstruct;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Objects;
 
 @Slf4j
 @Component
@@ -29,7 +33,10 @@ public class JwtUtil {
     public static final String AUTH_HEADER = "Authorization";
     public static final String TOKEN_TYPE = "Bearer ";
 
+
+
     private final KeyConfig keyConfig;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     private static String secret;
 
@@ -47,7 +54,7 @@ public class JwtUtil {
         this.secret = keyConfig.keyStorage(secret);
     }
 
-    private static String createToken(String memberId,
+    private String createToken(String memberId,
                                       Collection<? extends GrantedAuthority> authorities,
                                       String tokenType,
                                       Long tokenValidTime) {
@@ -68,28 +75,28 @@ public class JwtUtil {
 
     }
 
-    public static String createAccessToken(String memberId,
+    public String createAccessToken(String memberId,
                                            Collection<? extends GrantedAuthority> authorities) {
         return createToken(memberId, authorities, ACCESS_TOKEN, ACCESS_TOKEN_VALID_TIME);
     }
 
-    public static String createRefreshToken(String memberId,
+    public String createRefreshToken(String memberId,
                                             Collection<? extends GrantedAuthority> authorities) {
         return createToken(memberId, authorities, REFRESH_TOKEN, REFRESH_TOKEN_VALID_TIME);
     }
 
-    public static Claims parseClaims(String token) {
+    public Claims parseClaims(String token) {
         try {
             Jws<Claims> claimsJws = Jwts.parserBuilder().setSigningKey(secret).build().parseClaimsJws(token);
             return claimsJws.getBody();
-        } catch (SignatureException e) {
+        } catch (SignatureException | MalformedJwtException e) {
             throw new InvalidTokenException("유효하지 않는 토큰입니다");
         } catch (ExpiredJwtException e) {
             throw new InvalidTokenException("만료된 토큰입니다");
         }
     }
 
-    public static String reIssueAccessToken(Claims claims) {
+    public String reIssueAccessToken(Claims claims) {
         Date now = new Date();
         return Jwts.builder()
                 .setClaims(claims)
@@ -99,7 +106,20 @@ public class JwtUtil {
                 .compact();
     }
 
-    public static String getRefreshToken(String memberId) {
-        return "";
+    public String getRefreshToken(String refreshToken) {
+        Object memberId = redisTemplate.opsForValue().get(refreshToken);
+        if (Objects.isNull(memberId)) {
+            throw new RefreshTokenNotExistException();
+        }
+        return memberId.toString();
     }
+
+    public String getIssueMember(Claims claims) {
+        String issueMember = claims.get("memberId", String.class);
+        if (Objects.isNull(issueMember)) {
+            throw new InvalidClaimsException();
+        }
+        return issueMember;
+    }
+
 }

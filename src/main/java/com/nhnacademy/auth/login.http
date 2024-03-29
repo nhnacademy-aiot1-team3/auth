@@ -3,7 +3,7 @@ Content-Type: application/json
 
 {
   "id": "admin",
-  "password": "123"
+  "password": "1234"
 }
 
 ###
@@ -18,9 +18,9 @@ Accept: application/json
 ###
 POST http://localhost:9090/auth/token/reissue
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyZWZyZXNoLXRva2VuIiwibWVtYmVySWQiOiJhZG1pbiIsInJvbGVzIjpbeyJhdXRob3JpdHkiOiJST0xFX0FETUlOIn1dLCJpYXQiOjE3MTE2OTkxNTgsImV4cCI6MTcxMTc4NTU1OH0.lOj2ozGaNbyJfbfALIPRgZZXbMIXvOr0NoAcqKfA6-0
+Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyZWZyZXNoLXRva2VuIiwibWVtYmVySWQiOiJhZG1pbjEiLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9BRE1JTiJ9XSwiaWF0IjoxNzExNzE1MTk2LCJleHAiOjE3MTE4MDE1OTZ9.5lsBcFdhJHOyQhr5Uieb1BSXWkM2Bx-hqJE8Nq80ggo
 ###
-POST http://180.210.82.253:9090/auth/token/reissue
+POST http://133.186.209.25:8888/auth/token/reissue
 Content-Type: application/json
 Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyZWZyZXNoLXRva2VuIiwibWVtYmVySWQiOiJhZG1pbiIsInJvbGVzIjpbeyJhdXRob3JpdHkiOiJST0xFX0FETUlOIn1dLCJpYXQiOjE3MTE2OTkxNTgsImV4cCI6MTcxMTc4NTU1OH0.lOj2ozGaNbyJfbfALIPRgZZXbMIXvOr0NoAcqKfA6-0
 

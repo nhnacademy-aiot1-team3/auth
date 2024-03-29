@@ -19,7 +19,6 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
         User user = (User) this.getUserDetailsService().loadUserByUsername(memberId);
 
         if (!this.getPasswordEncoder().matches(memberPwd, user.getPassword())) {
-            log.info("{}", "wrong password");
             throw new BadCredentialsException("아이디/비밀번호가 틀렸습니다");
         }
 
