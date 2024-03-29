@@ -1,4 +1,4 @@
-POST http://180.210.82.253:9090/auth/login
+POST http://133.186.209.25:8888/auth/login
 Content-Type: application/json
 
 {
@@ -9,12 +9,29 @@ Content-Type: application/json
 ###
 POST http://localhost:9090/auth/login
 Content-Type: application/json
+Accept: application/json
 
 {
   "id": "admin",
-  "password": "1234"
+  "password": "123"
 }
+###
+POST http://localhost:9090/auth/token/reissue
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyZWZyZXNoLXRva2VuIiwibWVtYmVySWQiOiJhZG1pbiIsInJvbGVzIjpbeyJhdXRob3JpdHkiOiJST0xFX0FETUlOIn1dLCJpYXQiOjE3MTE2OTkxNTgsImV4cCI6MTcxMTc4NTU1OH0.lOj2ozGaNbyJfbfALIPRgZZXbMIXvOr0NoAcqKfA6-0
 
 ###
 GET http://133.186.218.201:8090/member/admin
+
+
+###
+POST http://192.168.71.61:8090/member
+Content-Type: application/json
+
+{
+  "id": "admin",
+  "password": "$2a$10$rpdKrkJ3E4bJoUNfmI8Z7OmD4bTbs.iPyGGKkRmy5j2Qp/rDJT6gO"
+}
+
+
 
