@@ -4,9 +4,9 @@ package com.nhnacademy.auth.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.auth.security.details.CustomUserDetailsService;
 import com.nhnacademy.auth.security.filter.CustomAuthenticationFilter;
-import com.nhnacademy.auth.security.handler.CustomAuthenticationFailureHandler;
 import com.nhnacademy.auth.security.provider.CustomAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -23,13 +23,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  *
  * @author : 양현성
  */
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
 
     private final ObjectMapper objectMapper;
     private final CustomUserDetailsService customUserDetailsService;
-    private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
     private final RedisTemplate<String, Object> redisTemplate;
 
     private static final String LOGIN_URL = "/auth/login";
@@ -74,7 +74,6 @@ public class SecurityConfig {
 
         customAuthenticationFilter.setFilterProcessesUrl(LOGIN_URL);
         customAuthenticationFilter.setAuthenticationManager(getAuthenticationManager(null));
-        customAuthenticationFilter.setAuthenticationFailureHandler(customAuthenticationFailureHandler);
         return customAuthenticationFilter;
     }
 
@@ -83,6 +82,10 @@ public class SecurityConfig {
         CustomAuthenticationProvider customAuthenticationProvider = new CustomAuthenticationProvider();
 
         customAuthenticationProvider.setUserDetailsService(customUserDetailsService);
+
+        String encode = passwordEncoder().encode("123");
+        log.info(encode);
+
         customAuthenticationProvider.setPasswordEncoder(passwordEncoder());
 
         return customAuthenticationProvider;

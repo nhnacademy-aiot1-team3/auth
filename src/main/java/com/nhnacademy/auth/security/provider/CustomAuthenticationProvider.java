@@ -20,7 +20,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
 
         if (!this.getPasswordEncoder().matches(memberPwd, user.getPassword())) {
             log.info("{}", "wrong password");
-            throw new BadCredentialsException("BadCredentialsException");
+            throw new BadCredentialsException("아이디/비밀번호가 틀렸습니다");
         }
 
         return new UsernamePasswordAuthenticationToken(
