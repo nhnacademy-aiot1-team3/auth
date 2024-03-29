@@ -52,8 +52,6 @@ public class JwtUtil {
                                       String tokenType,
                                       Long tokenValidTime) {
 
-        log.info("{}", secret);
-
         Claims claims = Jwts.claims().setSubject(tokenType);
 
         claims.put("memberId", memberId);
