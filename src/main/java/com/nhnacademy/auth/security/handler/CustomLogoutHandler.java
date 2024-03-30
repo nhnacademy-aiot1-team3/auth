@@ -20,7 +20,7 @@ public class CustomLogoutHandler implements LogoutHandler {
 
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-        LogoutRequestDto logoutRequestDto=null;
+        LogoutRequestDto logoutRequestDto = null;
         try {
             logoutRequestDto = objectMapper.readValue(request.getInputStream(), LogoutRequestDto.class);
         } catch (IOException e) {
@@ -32,8 +32,6 @@ public class CustomLogoutHandler implements LogoutHandler {
         redisTemplate.opsForSet().add(BLACK_LIST, accessToken);
         redisTemplate.opsForSet().add(BLACK_LIST, refreshToken);
 
-        redisTemplate.delete(accessToken);
         redisTemplate.delete(refreshToken);
-
     }
 }

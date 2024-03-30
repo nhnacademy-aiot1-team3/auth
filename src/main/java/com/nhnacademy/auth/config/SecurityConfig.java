@@ -36,7 +36,7 @@ public class SecurityConfig {
     private final JwtUtil jwtUtil;
 
     private static final String LOGIN_URL = "/auth/login";
-    private static final String LOGOUT_URL = "/auth/login";
+    private static final String LOGOUT_URL = "/auth/logout";
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
