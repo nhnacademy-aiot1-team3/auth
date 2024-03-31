@@ -6,6 +6,7 @@ import com.nhnacademy.auth.security.details.CustomUserDetailsService;
 import com.nhnacademy.auth.security.filter.CustomAuthenticationFilter;
 import com.nhnacademy.auth.security.handler.CustomLogoutHandler;
 import com.nhnacademy.auth.security.provider.CustomAuthenticationProvider;
+import com.nhnacademy.auth.token.service.TokenService;
 import com.nhnacademy.auth.token.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +35,7 @@ public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
     private final RedisTemplate<String, Object> redisTemplate;
     private final JwtUtil jwtUtil;
-
+    private final TokenService tokenService;
     private static final String LOGIN_URL = "/auth/login";
     private static final String LOGOUT_URL = "/auth/logout";
 
@@ -75,7 +76,7 @@ public class SecurityConfig {
 
     @Bean
     public CustomAuthenticationFilter customAuthenticationFilter() throws Exception {
-        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(jwtUtil,objectMapper,redisTemplate);
+        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(jwtUtil,objectMapper,redisTemplate,tokenService);
 
         customAuthenticationFilter.setFilterProcessesUrl(LOGIN_URL);
 

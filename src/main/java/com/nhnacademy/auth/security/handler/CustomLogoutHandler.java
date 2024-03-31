@@ -16,7 +16,7 @@ public class CustomLogoutHandler implements LogoutHandler {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
-    private static final String BLACK_LIST = "Black_List";
+    private static final String BLACKLIST_PREFIX = "blacklist:";
 
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
@@ -29,8 +29,8 @@ public class CustomLogoutHandler implements LogoutHandler {
         String accessToken = logoutRequestDto.getAccessToken();
         String refreshToken = logoutRequestDto.getRefreshToken();
 
-        redisTemplate.opsForSet().add(BLACK_LIST, accessToken);
-        redisTemplate.opsForSet().add(BLACK_LIST, refreshToken);
+        redisTemplate.opsForSet().add(BLACKLIST_PREFIX+ accessToken);
+        redisTemplate.opsForSet().add(BLACKLIST_PREFIX+ refreshToken);
 
         redisTemplate.delete(refreshToken);
     }

@@ -18,7 +18,7 @@ Accept: application/json
 ###
 POST http://localhost:9090/auth/token/reissue
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyZWZyZXNoLXRva2VuIiwibWVtYmVySWQiOiJhZG1pbjEiLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9BRE1JTiJ9XSwiaWF0IjoxNzExNzE1MTk2LCJleHAiOjE3MTE4MDE1OTZ9.5lsBcFdhJHOyQhr5Uieb1BSXWkM2Bx-hqJE8Nq80ggo
+Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyZWZyZXNoLXRva2VuIiwibWVtYmVySWQiOiJhZG1pbiIsInJvbGVzIjpbeyJhdXRob3JpdHkiOiJST0xFX0FETUlOIn0seyJhdXRob3JpdHkiOiJST0xFX0FETUlOMSJ9XSwiaWF0IjoxNzExODkwNDE1LCJleHAiOjE3MDAwMDAwMDB9.iaNMZgy0_P021kJEzb_BmTSnikgxQUO3zD1gKg3r95c
 ###
 POST http://133.186.209.25:8888/auth/token/reissue
 Content-Type: application/json

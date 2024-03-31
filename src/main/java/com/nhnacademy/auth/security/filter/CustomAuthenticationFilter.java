@@ -6,6 +6,7 @@ import com.nhnacademy.auth.member.dto.request.LoginRequestDto;
 import com.nhnacademy.auth.member.dto.response.ResponseDto;
 import com.nhnacademy.auth.member.dto.response.ResponseHeaderDto;
 import com.nhnacademy.auth.member.dto.response.TokenResponseDto;
+import com.nhnacademy.auth.token.service.TokenService;
 import com.nhnacademy.auth.token.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,10 +44,14 @@ import static com.nhnacademy.auth.token.util.JwtUtil.REFRESH_TOKEN_VALID_TIME;
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private static final String LOGIN_SUCCESS = "Login-Success";
+    private static final String REFRESH_TOKEN_PREFIX = "refresh_token:";
+
 
     private final JwtUtil jwtUtil;
     private final ObjectMapper objectMapper;
     private final RedisTemplate<String, Object>redisTemplate;
+
+    private final TokenService tokenService;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -65,20 +70,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException {
         UserDetails principal = (UserDetails) authResult.getPrincipal();
 
-        String accessToken = jwtUtil.createAccessToken(principal.getUsername(), principal.getAuthorities());
-        String refreshToken = jwtUtil.createRefreshToken(principal.getUsername(), principal.getAuthorities());
-
-
-        redisTemplate.opsForValue().set(refreshToken,principal.getUsername());
-        redisTemplate.expire(refreshToken, REFRESH_TOKEN_VALID_TIME, TimeUnit.MILLISECONDS);
-
-
-        TokenResponseDto tokenResponseDto = new TokenResponseDto(
-                accessToken,
-                refreshToken,
-                new Date().getTime()+ACCESS_TOKEN_VALID_TIME,
-                new Date().getTime()+REFRESH_TOKEN_VALID_TIME
-        );
+        TokenResponseDto tokenResponseDto = tokenService.tokenIssue(principal.getUsername(), principal.getAuthorities());
 
         response.setCharacterEncoding("UTF-8");
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

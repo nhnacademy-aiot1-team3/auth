@@ -1,11 +1,11 @@
 package com.nhnacademy.auth.token.controller;
 
 
-import com.nhnacademy.auth.exception.MismatchedMemberException;
 import com.nhnacademy.auth.member.dto.response.ResponseDto;
 import com.nhnacademy.auth.member.dto.response.ResponseHeaderDto;
+import com.nhnacademy.auth.member.dto.response.TokenResponseDto;
+import com.nhnacademy.auth.token.service.TokenService;
 import com.nhnacademy.auth.token.util.JwtUtil;
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -22,25 +22,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth/token/reissue")
 public class TokenController {
     private final JwtUtil jwtUtil;
+    private final TokenService tokenService;
 
     @PostMapping
     public ResponseEntity<ResponseDto> jwtReissue(@RequestHeader(name = HttpHeaders.AUTHORIZATION, required = false) String refreshToken) {
-        String memberId = jwtUtil.getRefreshToken(refreshToken);
-
-        Claims claims = jwtUtil.parseClaims(refreshToken);
-
-        String issueMember = jwtUtil.getIssueMember(claims);
-        if (!memberId.equals(issueMember)) {
-            throw new MismatchedMemberException();
-        }
-        String reissueToken = jwtUtil.reIssueAccessToken(claims);
-
+        TokenResponseDto tokenResponseDto = tokenService.tokenReissue(refreshToken);
 
         HttpHeaders headers = new HttpHeaders();
 
         ResponseHeaderDto responseHeaderDto = new ResponseHeaderDto(1L, "토큰 재발급 성공");
 
-        ResponseDto responseDto = new ResponseDto(responseHeaderDto, reissueToken);
+        ResponseDto responseDto = new ResponseDto(responseHeaderDto, tokenResponseDto);
 
         return ResponseEntity
                 .ok()

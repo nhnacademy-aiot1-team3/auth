@@ -20,6 +20,7 @@ import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
@@ -31,6 +32,8 @@ public class JwtUtil {
     public static final Long REFRESH_TOKEN_VALID_TIME = Duration.ofDays(1).toMillis();
     private static final String ACCESS_TOKEN = "access-token";
     private static final String REFRESH_TOKEN = "refresh-token";
+    public static final String REFRESH_TOKEN_PREFIX = "refresh_token:";
+
 
     public static final String AUTH_HEADER = "Authorization";
     public static final String TOKEN_TYPE = "Bearer ";
@@ -108,12 +111,12 @@ public class JwtUtil {
                 .compact();
     }
 
-    public String getRefreshToken(String refreshToken) {
-        Object memberId = redisTemplate.opsForValue().get(refreshToken);
-        if (Objects.isNull(memberId)) {
+    public String getRefreshToken(String memberId) {
+        Object refreshToken = redisTemplate.opsForValue().get(REFRESH_TOKEN_PREFIX + memberId);
+        if (Objects.isNull(refreshToken)) {
             throw new RefreshTokenNotExistException();
         }
-        return memberId.toString();
+        return refreshToken.toString();
     }
 
     public String getIssueMember(Claims claims) {
