@@ -57,6 +57,7 @@ public class JwtUtil {
     @PostConstruct
     private void init() {
         this.secret = keyConfig.keyStorage(secret);
+        log.info("{}",secret);
     }
 
     private String createToken(String memberId,

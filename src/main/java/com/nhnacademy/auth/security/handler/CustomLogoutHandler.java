@@ -10,6 +10,9 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Objects;
+
+import static com.nhnacademy.auth.token.util.JwtUtil.REFRESH_TOKEN_PREFIX;
 
 @RequiredArgsConstructor
 public class CustomLogoutHandler implements LogoutHandler {
@@ -21,6 +24,10 @@ public class CustomLogoutHandler implements LogoutHandler {
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         LogoutRequestDto logoutRequestDto = null;
+        String memberId = request.getHeader("X-USER-ID");
+        if (Objects.isNull(memberId)) {
+
+        }
         try {
             logoutRequestDto = objectMapper.readValue(request.getInputStream(), LogoutRequestDto.class);
         } catch (IOException e) {
@@ -32,6 +39,6 @@ public class CustomLogoutHandler implements LogoutHandler {
         redisTemplate.opsForSet().add(BLACKLIST_PREFIX+ accessToken);
         redisTemplate.opsForSet().add(BLACKLIST_PREFIX+ refreshToken);
 
-        redisTemplate.delete(refreshToken);
+        redisTemplate.delete(REFRESH_TOKEN_PREFIX + memberId);
     }
 }

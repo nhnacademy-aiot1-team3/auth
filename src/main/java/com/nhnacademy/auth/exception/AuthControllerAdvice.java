@@ -12,7 +12,6 @@ public class AuthControllerAdvice {
     @ExceptionHandler(value = {
             InvalidTokenException.class,
             InvalidClaimsException.class,
-            MismatchedRefreshTokenException.class
     })
     public ResponseEntity<ResponseDto<ResponseHeaderDto, Object>> invalidTokenExceptionHandler(Exception e) {
         ResponseHeaderDto responseHeaderDto = new ResponseHeaderDto(11L, e.getMessage());
@@ -25,7 +24,8 @@ public class AuthControllerAdvice {
     }
 
     @ExceptionHandler(value = {
-            RefreshTokenNotExistException.class
+            RefreshTokenNotExistException.class,
+            MismatchedRefreshTokenException.class
     })
     public ResponseEntity<ResponseDto<ResponseHeaderDto,Object>> unauthorized(Exception e) {
         ResponseHeaderDto responseHeaderDto = new ResponseHeaderDto(12L, e.getMessage());

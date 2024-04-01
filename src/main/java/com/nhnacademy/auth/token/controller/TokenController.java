@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/auth/token/reissue")
 public class TokenController {
-    private final JwtUtil jwtUtil;
+
     private final TokenService tokenService;
 
     @PostMapping
