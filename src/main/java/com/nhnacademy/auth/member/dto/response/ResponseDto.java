@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class ResponseDto<T> {
+public class ResponseDto<T,V> {
     private T header;
-    private T body;
+    private V body;
 }

@@ -4,7 +4,10 @@ package com.nhnacademy.auth.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.auth.security.details.CustomUserDetailsService;
 import com.nhnacademy.auth.security.filter.CustomAuthenticationFilter;
+import com.nhnacademy.auth.security.handler.CustomLogoutHandler;
 import com.nhnacademy.auth.security.provider.CustomAuthenticationProvider;
+import com.nhnacademy.auth.token.service.TokenService;
+import com.nhnacademy.auth.token.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -31,15 +34,17 @@ public class SecurityConfig {
     private final ObjectMapper objectMapper;
     private final CustomUserDetailsService customUserDetailsService;
     private final RedisTemplate<String, Object> redisTemplate;
-
+    private final JwtUtil jwtUtil;
+    private final TokenService tokenService;
     private static final String LOGIN_URL = "/auth/login";
+    private static final String LOGOUT_URL = "/auth/logout";
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .cors().disable()
                 .formLogin().disable()
-                .logout().disable();
+                .logout().logoutUrl(LOGOUT_URL).addLogoutHandler(customLogoutHandler());
         http.addFilterAt(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -53,6 +58,7 @@ public class SecurityConfig {
 
     /**
      * 유저의 비밀번호를 암호화, 검증 해주는 빈
+     *
      * @return BCryptPasswordEncoder 반환
      */
 
@@ -64,15 +70,17 @@ public class SecurityConfig {
 
     /**
      * 로그인 정보를 받았을 때 인증서버의 dispatcher 이전에서 실행될 필터 메소드 빈
+     *
      * @return
      * @throws Exception
      */
 
     @Bean
     public CustomAuthenticationFilter customAuthenticationFilter() throws Exception {
-        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(objectMapper,redisTemplate);
+        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(jwtUtil, objectMapper, redisTemplate, tokenService);
 
         customAuthenticationFilter.setFilterProcessesUrl(LOGIN_URL);
+
         customAuthenticationFilter.setAuthenticationManager(getAuthenticationManager(null));
         return customAuthenticationFilter;
     }
@@ -86,4 +94,10 @@ public class SecurityConfig {
 
         return customAuthenticationProvider;
     }
+
+    @Bean
+    public CustomLogoutHandler customLogoutHandler() {
+        return new CustomLogoutHandler(redisTemplate, objectMapper);
+    }
+
 }

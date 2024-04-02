@@ -3,8 +3,10 @@ package com.nhnacademy.auth.token.controller;
 
 import com.nhnacademy.auth.member.dto.response.ResponseDto;
 import com.nhnacademy.auth.member.dto.response.ResponseHeaderDto;
+import com.nhnacademy.auth.member.dto.response.TokenResponseDto;
+import com.nhnacademy.auth.token.service.TokenService;
 import com.nhnacademy.auth.token.util.JwtUtil;
-import io.jsonwebtoken.Claims;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -13,26 +15,24 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.nhnacademy.auth.token.util.JwtUtil.AUTH_HEADER;
-import static com.nhnacademy.auth.token.util.JwtUtil.TOKEN_TYPE;
-
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/auth/token/reissue")
 public class TokenController {
 
+    private final TokenService tokenService;
+
     @PostMapping
     public ResponseEntity<ResponseDto> jwtReissue(@RequestHeader(name = HttpHeaders.AUTHORIZATION, required = false) String refreshToken) {
-        Claims claims = JwtUtil.parseClaims(refreshToken);
-
-        String reissueToken = JwtUtil.reIssueAccessToken(claims);
+        TokenResponseDto tokenResponseDto = tokenService.tokenReissue(refreshToken);
 
         HttpHeaders headers = new HttpHeaders();
 
         ResponseHeaderDto responseHeaderDto = new ResponseHeaderDto(1L, "토큰 재발급 성공");
 
-        ResponseDto responseDto = new ResponseDto(responseHeaderDto, reissueToken);
+        ResponseDto responseDto = new ResponseDto(responseHeaderDto, tokenResponseDto);
 
         return ResponseEntity
                 .ok()
