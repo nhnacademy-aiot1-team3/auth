@@ -6,6 +6,7 @@ import com.nhnacademy.auth.member.dto.request.LoginRequestDto;
 import com.nhnacademy.auth.member.dto.response.ResponseDto;
 import com.nhnacademy.auth.member.dto.response.ResponseHeaderDto;
 import com.nhnacademy.auth.member.dto.response.TokenResponseDto;
+import com.nhnacademy.auth.security.details.CustomUser;
 import com.nhnacademy.auth.token.service.TokenService;
 import com.nhnacademy.auth.token.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +45,6 @@ import static com.nhnacademy.auth.token.util.JwtUtil.REFRESH_TOKEN_VALID_TIME;
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private static final String LOGIN_SUCCESS = "Login-Success";
-    private static final String REFRESH_TOKEN_PREFIX = "refresh_token:";
 
 
     private final JwtUtil jwtUtil;
@@ -68,9 +68,9 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException {
-        UserDetails principal = (UserDetails) authResult.getPrincipal();
+        CustomUser principal = (CustomUser) authResult.getPrincipal();
 
-        TokenResponseDto tokenResponseDto = tokenService.tokenIssue(principal.getUsername(), principal.getAuthorities());
+        TokenResponseDto tokenResponseDto = tokenService.tokenIssue(principal.getUsername(),principal.getMemberDto().getMemberEmail(), principal.getAuthorities());
 
         response.setCharacterEncoding("UTF-8");
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

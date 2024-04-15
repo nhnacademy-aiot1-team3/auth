@@ -61,6 +61,7 @@ public class JwtUtil {
     }
 
     private String createToken(String memberId,
+                               String memberEmail,
                                       Collection<? extends GrantedAuthority> authorities,
                                       String tokenType,
                                       Long tokenValidTime) {
@@ -68,6 +69,7 @@ public class JwtUtil {
         Claims claims = Jwts.claims().setSubject(tokenType);
 
         claims.put("memberId", memberId);
+        claims.put("memberEmail", memberEmail);
         claims.put("roles", authorities);
 
         Date now = new Date();
@@ -82,13 +84,15 @@ public class JwtUtil {
     }
 
     public String createAccessToken(String memberId,
+                                           String memberEmail,
                                            Collection<? extends GrantedAuthority> authorities) {
-        return createToken(memberId, authorities, ACCESS_TOKEN, ACCESS_TOKEN_VALID_TIME);
+        return createToken(memberId,memberEmail, authorities, ACCESS_TOKEN, ACCESS_TOKEN_VALID_TIME);
     }
 
     public String createRefreshToken(String memberId,
+                                     String memberEmail,
                                             Collection<? extends GrantedAuthority> authorities) {
-        return createToken(memberId, authorities, REFRESH_TOKEN, REFRESH_TOKEN_VALID_TIME);
+        return createToken(memberId,memberEmail, authorities, REFRESH_TOKEN, REFRESH_TOKEN_VALID_TIME);
     }
 
     public Claims parseClaims(String token) {
@@ -122,6 +126,14 @@ public class JwtUtil {
 
     public String getIssueMember(Claims claims) {
         String issueMember = claims.get("memberId", String.class);
+        if (Objects.isNull(issueMember)) {
+            throw new InvalidClaimsException();
+        }
+        return issueMember;
+    }
+
+    public String getIssueMemberEmail(Claims claims) {
+        String issueMember = claims.get("memberEmail", String.class);
         if (Objects.isNull(issueMember)) {
             throw new InvalidClaimsException();
         }

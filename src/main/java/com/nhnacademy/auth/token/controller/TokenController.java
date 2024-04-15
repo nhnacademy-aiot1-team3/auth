@@ -15,18 +15,20 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.nhnacademy.auth.token.util.JwtUtil.TOKEN_TYPE;
+
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/auth/token/reissue")
+@RequestMapping("/auth/token")
 public class TokenController {
 
     private final TokenService tokenService;
 
-    @PostMapping
+    @PostMapping("/reissue")
     public ResponseEntity<ResponseDto> jwtReissue(@RequestHeader(name = HttpHeaders.AUTHORIZATION, required = false) String refreshToken) {
-        TokenResponseDto tokenResponseDto = tokenService.tokenReissue(refreshToken);
+        TokenResponseDto tokenResponseDto = tokenService.tokenReissue(refreshToken.substring(TOKEN_TYPE.length(),refreshToken.length()));
 
         HttpHeaders headers = new HttpHeaders();
 

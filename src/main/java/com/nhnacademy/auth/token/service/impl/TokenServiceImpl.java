@@ -30,9 +30,9 @@ public class TokenServiceImpl implements TokenService {
 
 
     @Override
-    public TokenResponseDto tokenIssue(String memberId, Collection<? extends GrantedAuthority> authorities) {
-        String accessToken = jwtUtil.createAccessToken(memberId, authorities);
-        String refreshToken = createRefreshToken(memberId, authorities);
+    public TokenResponseDto tokenIssue(String memberId,String memberEmail, Collection<? extends GrantedAuthority> authorities) {
+        String accessToken = jwtUtil.createAccessToken(memberId,memberEmail ,authorities);
+        String refreshToken = createRefreshToken(memberId,memberEmail, authorities);
 
         return new TokenResponseDto(
                 accessToken,
@@ -47,6 +47,7 @@ public class TokenServiceImpl implements TokenService {
         Claims claims = jwtUtil.parseClaims(refreshToken);
 
         String memberId = jwtUtil.getIssueMember(claims);
+        String memberEmail = jwtUtil.getIssueMemberEmail(claims);
         String oldRefreshToken = jwtUtil.getRefreshToken(memberId);
 
         List<SimpleGrantedAuthority> simpleGrantedAuthorities = claims.get("roles",List.class);
@@ -56,7 +57,7 @@ public class TokenServiceImpl implements TokenService {
             throw new MismatchedRefreshTokenException();
         }
         String reIssueAccessToken = jwtUtil.reIssueAccessToken(claims);
-        String reissueRefreshToken = createRefreshToken(memberId, simpleGrantedAuthorities);
+        String reissueRefreshToken = createRefreshToken(memberId, memberEmail,simpleGrantedAuthorities);
 
         return new TokenResponseDto(
                 reIssueAccessToken,
@@ -66,8 +67,8 @@ public class TokenServiceImpl implements TokenService {
         );
     }
 
-    private String createRefreshToken(String memberId,Collection<? extends GrantedAuthority> authorities) {
-        String reissueRefreshToken = jwtUtil.createRefreshToken(memberId, authorities);
+    private String createRefreshToken(String memberId,String memberEmail,Collection<? extends GrantedAuthority> authorities) {
+        String reissueRefreshToken = jwtUtil.createRefreshToken(memberId,memberEmail, authorities);
 
         String key = REFRESH_TOKEN_PREFIX + memberId;
 
