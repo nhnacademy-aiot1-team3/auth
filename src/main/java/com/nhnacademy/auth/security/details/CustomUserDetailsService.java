@@ -1,6 +1,7 @@
 package com.nhnacademy.auth.security.details;
 
 import com.nhnacademy.auth.member.adaptor.MemberAdaptor;
+import com.nhnacademy.auth.member.dto.MemberDto;
 import com.nhnacademy.auth.member.dto.request.LoginRequestDto;
 import com.nhnacademy.auth.member.dto.response.LoginInfoResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -24,9 +26,9 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        LoginInfoResponseDto loginInfoResponseDto = memberAdaptor.getMember(username).orElseThrow(() -> new UsernameNotFoundException("유저가 존재하지않습니다"));
-        List<SimpleGrantedAuthority> grantedAuthorities = List.of(new SimpleGrantedAuthority("ROLE_ADMIN"),new SimpleGrantedAuthority("ROLE_ADMIN1"));
+        MemberDto memberDto = memberAdaptor.getMember(username).orElseThrow(() -> new UsernameNotFoundException("유저가 존재하지않습니다"));
+        CustomUser customUser = new CustomUser(memberDto);
 
-        return new User(loginInfoResponseDto.getId(), loginInfoResponseDto.getPassword(), grantedAuthorities);
+        return customUser;
     }
 }

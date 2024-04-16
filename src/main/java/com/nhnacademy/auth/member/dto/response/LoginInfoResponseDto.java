@@ -10,4 +10,5 @@ import lombok.ToString;
 public class LoginInfoResponseDto {
     private String id;
     private String password;
+    private String role;
 }
