@@ -1,5 +1,6 @@
 package com.nhnacademy.auth.security.details;
 
+import com.nhnacademy.auth.exception.MemberStatusException;
 import com.nhnacademy.auth.member.adaptor.MemberAdaptor;
 import com.nhnacademy.auth.member.dto.MemberDto;
 import com.nhnacademy.auth.member.dto.request.LoginRequestDto;
@@ -27,7 +28,13 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         MemberDto memberDto = memberAdaptor.getMember(username).orElseThrow(() -> new UsernameNotFoundException("유저가 존재하지않습니다"));
+        if (memberDto.getState().equalsIgnoreCase("WAIT")) {
+            throw new MemberStatusException();
+        }
+
         CustomUser customUser = new CustomUser(memberDto);
+
+
 
         return customUser;
     }
