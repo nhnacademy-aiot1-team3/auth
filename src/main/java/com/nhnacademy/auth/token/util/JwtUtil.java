@@ -8,12 +8,15 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.jcajce.provider.digest.SHA256;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.Key;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -74,11 +77,13 @@ public class JwtUtil {
 
         Date now = new Date();
 
+        Key key = new SecretKeySpec(secret.getBytes(),SignatureAlgorithm.HS256.getJcaName());
+
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + tokenValidTime))
-                .signWith(SignatureAlgorithm.HS256, secret)
+                .signWith(key)
                 .compact();
 
     }
@@ -97,7 +102,9 @@ public class JwtUtil {
 
     public Claims parseClaims(String token) {
         try {
-            Jws<Claims> claimsJws = Jwts.parserBuilder().setSigningKey(secret).build().parseClaimsJws(token);
+            Key key = new SecretKeySpec(secret.getBytes(),SignatureAlgorithm.HS256.getJcaName());
+
+            Jws<Claims> claimsJws = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return claimsJws.getBody();
         } catch (SignatureException | MalformedJwtException e) {
             throw new InvalidTokenException("유효하지 않는 토큰입니다");
@@ -108,11 +115,13 @@ public class JwtUtil {
 
     public String reIssueAccessToken(Claims claims) {
         Date now = new Date();
+        Key key = new SecretKeySpec(secret.getBytes(),SignatureAlgorithm.HS256.getJcaName());
+
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + ACCESS_TOKEN_VALID_TIME))
-                .signWith(SignatureAlgorithm.HS256, secret)
+                .signWith(key)
                 .compact();
     }
 

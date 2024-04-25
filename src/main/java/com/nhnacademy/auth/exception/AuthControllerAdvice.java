@@ -35,4 +35,15 @@ public class AuthControllerAdvice {
                 .body(responseDto);
     }
 
+    @ExceptionHandler(value = {
+            MemberStatusException.class
+    })
+    public ResponseEntity<ResponseDto<ResponseHeaderDto, Object>> memberStatusExceptionHandler(Exception e) {
+        ResponseHeaderDto responseHeaderDto = new ResponseHeaderDto(13L, e.getMessage());
+        ResponseDto<ResponseHeaderDto, Object> responseDto = new ResponseDto<>(responseHeaderDto, null);
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(responseDto);
+    }
+
 }
