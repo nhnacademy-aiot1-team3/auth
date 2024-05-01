@@ -1,6 +1,5 @@
 package com.nhnacademy.auth.token.util;
 
-import com.nhnacademy.auth.config.KeyConfig;
 import com.nhnacademy.auth.exception.InvalidClaimsException;
 import com.nhnacademy.auth.exception.InvalidTokenException;
 import com.nhnacademy.auth.exception.RefreshTokenNotExistException;
@@ -8,7 +7,6 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bouncycastle.jcajce.provider.digest.SHA256;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,12 +16,9 @@ import javax.annotation.PostConstruct;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.time.Duration;
-import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
@@ -41,27 +36,10 @@ public class JwtUtil {
     public static final String AUTH_HEADER = "Authorization";
     public static final String TOKEN_TYPE = "Bearer ";
 
-
-
-    private final KeyConfig keyConfig;
     private final RedisTemplate<String, Object> redisTemplate;
 
     private static String secret;
 
-
-    public String getSecret() {
-        return secret;
-    }
-
-    public void setSecret(String secret) {
-        this.secret = secret;
-    }
-
-    @PostConstruct
-    private void init() {
-        this.secret = keyConfig.keyStorage(secret);
-        log.info("{}",secret);
-    }
 
     private String createToken(String memberId,
                                String memberEmail,
