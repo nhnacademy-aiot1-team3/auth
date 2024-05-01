@@ -1,5 +1,6 @@
 package com.nhnacademy.auth.security.provider;
 
+import com.nhnacademy.auth.exception.MemberStateNotAllowException;
 import com.nhnacademy.auth.security.details.CustomUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -21,6 +22,9 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
 
         if (!this.getPasswordEncoder().matches(memberPwd, user.getPassword())) {
             throw new BadCredentialsException("아이디/비밀번호가 틀렸습니다");
+        }
+        if (user.getMemberDto().getState().equalsIgnoreCase("WAIT")) {
+            throw new MemberStateNotAllowException();
         }
 
         return new UsernamePasswordAuthenticationToken(
