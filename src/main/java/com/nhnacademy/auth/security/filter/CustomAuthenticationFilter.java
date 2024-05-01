@@ -2,6 +2,7 @@ package com.nhnacademy.auth.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.auth.exception.LoginRequestDtoParsingException;
+import com.nhnacademy.auth.exception.MemberStateNotAllowException;
 import com.nhnacademy.auth.member.dto.request.LoginRequestDto;
 import com.nhnacademy.auth.member.dto.response.ResponseDto;
 import com.nhnacademy.auth.member.dto.response.ResponseHeaderDto;
@@ -18,8 +19,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -27,12 +26,6 @@ import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.Duration;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
-
-import static com.nhnacademy.auth.token.util.JwtUtil.ACCESS_TOKEN_VALID_TIME;
-import static com.nhnacademy.auth.token.util.JwtUtil.REFRESH_TOKEN_VALID_TIME;
 
 
 /**
@@ -49,7 +42,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
     private final JwtUtil jwtUtil;
     private final ObjectMapper objectMapper;
-    private final RedisTemplate<String, Object>redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     private final TokenService tokenService;
 
@@ -70,7 +63,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException {
         CustomUser principal = (CustomUser) authResult.getPrincipal();
 
-        TokenResponseDto tokenResponseDto = tokenService.tokenIssue(principal.getUsername(),principal.getMemberDto().getMemberEmail(), principal.getAuthorities());
+        TokenResponseDto tokenResponseDto = tokenService.tokenIssue(principal.getUsername(), principal.getMemberDto().getMemberEmail(), principal.getAuthorities());
 
         response.setCharacterEncoding("UTF-8");
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -93,6 +86,8 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
             responseHeaderDto = new ResponseHeaderDto(4L, failed.getMessage());
         } else if (failed instanceof UsernameNotFoundException) {
             responseHeaderDto = new ResponseHeaderDto(5L, failed.getMessage());
+        } else if (failed instanceof MemberStateNotAllowException) {
+            responseHeaderDto = new ResponseHeaderDto(13L, failed.getMessage());
         }
 
         response.setCharacterEncoding("UTF-8");
