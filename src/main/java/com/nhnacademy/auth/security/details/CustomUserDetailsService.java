@@ -1,21 +1,14 @@
 package com.nhnacademy.auth.security.details;
 
-import com.nhnacademy.auth.exception.MemberStatusException;
+import com.nhnacademy.auth.exception.MemberStateNotAllowException;
 import com.nhnacademy.auth.member.adaptor.MemberAdaptor;
 import com.nhnacademy.auth.member.dto.MemberDto;
-import com.nhnacademy.auth.member.dto.request.LoginRequestDto;
-import com.nhnacademy.auth.member.dto.response.LoginInfoResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -29,11 +22,10 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         MemberDto memberDto = memberAdaptor.getMember(username).orElseThrow(() -> new UsernameNotFoundException("유저가 존재하지않습니다"));
         if (memberDto.getState().equalsIgnoreCase("WAIT")) {
-            throw new MemberStatusException();
+            throw new MemberStateNotAllowException();
         }
 
         CustomUser customUser = new CustomUser(memberDto);
-
 
 
         return customUser;
