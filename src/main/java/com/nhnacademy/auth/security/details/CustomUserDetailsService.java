@@ -21,9 +21,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         MemberDto memberDto = memberAdaptor.getMember(username).orElseThrow(() -> new UsernameNotFoundException("유저가 존재하지않습니다"));
-        if (memberDto.getState().equalsIgnoreCase("WAIT")) {
-            throw new MemberStateNotAllowException();
-        }
 
         CustomUser customUser = new CustomUser(memberDto);
 
