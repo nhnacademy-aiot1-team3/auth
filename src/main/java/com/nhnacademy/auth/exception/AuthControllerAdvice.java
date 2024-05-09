@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.server.ResponseStatusException;
 
 @ControllerAdvice
 public class AuthControllerAdvice {
@@ -25,7 +26,8 @@ public class AuthControllerAdvice {
 
     @ExceptionHandler(value = {
             RefreshTokenNotExistException.class,
-            MismatchedRefreshTokenException.class
+            MismatchedRefreshTokenException.class,
+            MissingRefreshTokenException.class,
     })
     public ResponseEntity<ResponseDto<ResponseHeaderDto,Object>> unauthorized(Exception e) {
         ResponseHeaderDto responseHeaderDto = new ResponseHeaderDto(12L, e.getMessage());

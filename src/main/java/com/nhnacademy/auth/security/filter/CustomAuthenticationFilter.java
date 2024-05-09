@@ -55,7 +55,6 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
             throw new LoginRequestDtoParsingException();
         }
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loginRequestDto.getId(), loginRequestDto.getPassword());
-
         return this.getAuthenticationManager().authenticate(token);
     }
 

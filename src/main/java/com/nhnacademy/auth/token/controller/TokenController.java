@@ -1,6 +1,7 @@
 package com.nhnacademy.auth.token.controller;
 
 
+import com.nhnacademy.auth.exception.MissingRefreshTokenException;
 import com.nhnacademy.auth.member.dto.response.ResponseDto;
 import com.nhnacademy.auth.member.dto.response.ResponseHeaderDto;
 import com.nhnacademy.auth.member.dto.response.TokenResponseDto;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Objects;
+
 import static com.nhnacademy.auth.token.util.JwtUtil.TOKEN_TYPE;
 
 
@@ -28,7 +31,10 @@ public class TokenController {
 
     @PostMapping("/reissue")
     public ResponseEntity<ResponseDto> jwtReissue(@RequestHeader(name = HttpHeaders.AUTHORIZATION, required = false) String refreshToken) {
-        TokenResponseDto tokenResponseDto = tokenService.tokenReissue(refreshToken.substring(TOKEN_TYPE.length(),refreshToken.length()));
+        if (Objects.isNull(refreshToken)) {
+            throw new MissingRefreshTokenException();
+        }
+        TokenResponseDto tokenResponseDto = tokenService.tokenReissue(refreshToken);
 
         HttpHeaders headers = new HttpHeaders();
 
