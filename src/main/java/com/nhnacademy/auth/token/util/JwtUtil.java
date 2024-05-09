@@ -5,7 +5,9 @@ import com.nhnacademy.auth.exception.InvalidTokenException;
 import com.nhnacademy.auth.exception.RefreshTokenNotExistException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -38,16 +40,9 @@ public class JwtUtil {
 
     private final RedisTemplate<String, Object> redisTemplate;
 
-    private static String secret;
-
-
-    public String getSecret() {
-        return secret;
-    }
-
-    public void setSecret(String secret) {
-        this.secret = secret;
-    }
+    @Setter
+    @Getter
+    private String secret;
 
 
     private String createToken(String memberId,
