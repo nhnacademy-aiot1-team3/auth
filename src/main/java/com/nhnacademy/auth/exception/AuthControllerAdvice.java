@@ -33,7 +33,7 @@ public class AuthControllerAdvice {
         ResponseHeaderDto responseHeaderDto = new ResponseHeaderDto(12L, e.getMessage());
         ResponseDto<ResponseHeaderDto, Object> responseDto = new ResponseDto<>(responseHeaderDto, null);
         return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
+                .badRequest()
                 .body(responseDto);
     }
 
